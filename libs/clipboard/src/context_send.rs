@@ -25,8 +25,26 @@ impl ContextSend {
     pub fn is_enabled() -> bool {
         CONTEXT_SEND.lock().unwrap().is_some()
     }
-
-    pub fn set_is_stopped() -> ResultType<()> {
+    
+    enum MyError {
+        StoppedFailed,       // 表示设置停止状态失败
+        InvalidState,        // 表示对象处于无效状态
+        IoError(std::io::Error), // 包装标准库的 IO 错误
+    }
+    
+    impl std::fmt::Display for MyError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                MyError::StoppedFailed => log::info!(f, "Failed to set stopped state"),
+                MyError::InvalidState => log::info!(f, "Object is in an invalid state"),
+                MyError::IoError(e) => log::info!(f, "IO error: {}", e),
+            }
+        }
+    }
+    
+    impl std::error::Error for MyError {}
+    
+    pub fn set_is_stopped() -> Result<(), MyError> {
         let _res = Self::proc(|c| c.set_is_stopped().map_err(|e| e.into()));
     }
 
