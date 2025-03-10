@@ -373,9 +373,7 @@ impl<T: InvokeUiSession> Remote<T> {
                     if stop {
                         #[cfg(target_os = "windows")]
                         {
-                            if ContextSend::is_enabled() {
-                                ContextSend::set_is_stopped();
-                            }
+                            ContextSend::set_is_stopped();
                         }
                     } else {
                         #[cfg(target_os = "windows")]
