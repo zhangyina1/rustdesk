@@ -26,7 +26,7 @@ impl ContextSend {
         CONTEXT_SEND.lock().unwrap().is_some()
     }
 
-    pub fn set_is_stopped() -> ResultType<()> {
+    pub fn set_is_stopped() -> Result<(),Error> {
         let _res = Self::proc(|c| c.set_is_stopped().map_err(|e| e.into()));
     }
 
