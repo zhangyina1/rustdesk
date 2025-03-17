@@ -1,4 +1,4 @@
-name: Local Full Flutter CI
+name: Full Flutter CI
 
 on:
   workflow_dispatch:
