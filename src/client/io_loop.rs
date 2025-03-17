@@ -375,7 +375,7 @@ impl<T: InvokeUiSession> Remote<T> {
                             || !(server_file_transfer_enabled && file_transfer_enabled));
                     log::debug!(
                         "Process clipboard message from system, stop: {}, is_stopping_allowed: {}, view_only: {}, server_file_transfer_enabled: {}, file_transfer_enabled: {}",
-                        view_only, stop, is_stopping_allowed, server_file_transfer_enabled, file_transfer_enabled
+                        stop, is_stopping_allowed, view_only,server_file_transfer_enabled, file_transfer_enabled
                     );
                     if stop {
                         #[cfg(target_os = "windows")]

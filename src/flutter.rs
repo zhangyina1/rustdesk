@@ -1218,8 +1218,8 @@ pub fn session_add(
     let session: Session<FlutterHandler> = Session {
         password: preset_password,
         server_keyboard_enabled: Arc::new(RwLock::new(true)),
-        server_file_transfer_enabled: Arc::new(RwLock::new(true)),
-        server_clipboard_enabled: Arc::new(RwLock::new(true)),
+        server_file_transfer_enabled: Arc::new(RwLock::new(false)),
+        server_clipboard_enabled: Arc::new(RwLock::new(false)),
         ..Default::default()
     };
 
