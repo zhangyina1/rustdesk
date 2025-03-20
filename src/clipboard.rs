@@ -783,7 +783,7 @@ pub mod clipboard_listener {
             for tx in sub_lock.values() {
                 //tx.send(CallbackResult::Next).ok();
             }
-            //CallbackResult::Next
+            CallbackResult::Next
         }
 
         fn on_clipboard_error(&mut self, error: io::Error) -> CallbackResult {
