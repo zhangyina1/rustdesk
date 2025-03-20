@@ -781,9 +781,9 @@ pub mod clipboard_listener {
         fn on_clipboard_change(&mut self) -> CallbackResult {
             let sub_lock = self.subscribers.lock().unwrap();
             for tx in sub_lock.values() {
-                tx.send(CallbackResult::Next).ok();
+                //tx.send(CallbackResult::Next).ok();
             }
-            CallbackResult::Next
+            //CallbackResult::Next
         }
 
         fn on_clipboard_error(&mut self, error: io::Error) -> CallbackResult {
