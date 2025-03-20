@@ -853,15 +853,12 @@ impl ClientClipboardHandler {
                         return;
                     }
                     if self.is_file_required() {
-                        log::info!("喵喵喵");
                         match clipboard::platform::unix::serv_files::sync_files(&urls) {
                             Ok(()) => {
-                                log::info!("喵喵喵");
                                 let msg = crate::clipboard_file::clip_2_msg(
                                     unix_file_clip::get_format_list(),
                                 );
                                 self.send_msg(msg, true);
-                                log::info!("喵喵喵");
                             }
                             Err(e) => {
                                 log::error!("Failed to sync clipboard files: {}", e);
@@ -874,9 +871,7 @@ impl ClientClipboardHandler {
 
             if let Some(msg) = check_clipboard(&mut self.ctx, ClipboardSide::Client, false) {
                 if self.is_text_required() {
-                    log::info!("喵喵喵");
                     self.send_msg(msg, false);
-                    log::info!("喵喵喵");
                 }
             }
         }
