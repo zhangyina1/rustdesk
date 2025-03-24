@@ -130,7 +130,7 @@ impl<T: InvokeUiSession> Remote<T> {
         #[cfg(target_os = "windows")]
         let _file_clip_context_holder = {
             // `is_port_forward()` will not reach here, but we still check it for clarity.
-            if !self.handler.is_file_transfer()
+            if (*self.handler.server_clipboard_enabled.write().unwrap() || *self.handler.server_file_transfer_enabled.write().unwrap()) && !self.handler.is_file_transfer()
                 && !self.handler.is_port_forward()
                 && !self.handler.is_view_camera()
             {
@@ -375,7 +375,7 @@ impl<T: InvokeUiSession> Remote<T> {
                             || !(server_file_transfer_enabled && file_transfer_enabled));
                     log::debug!(
                         "Process clipboard message from system, stop: {}, is_stopping_allowed: {}, view_only: {}, server_file_transfer_enabled: {}, file_transfer_enabled: {}",
-                        view_only, stop, is_stopping_allowed, server_file_transfer_enabled, file_transfer_enabled
+                        stop, is_stopping_allowed, view_only,server_file_transfer_enabled, file_transfer_enabled
                     );
                     if stop {
                         #[cfg(target_os = "windows")]
