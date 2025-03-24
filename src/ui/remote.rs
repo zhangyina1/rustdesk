@@ -551,8 +551,8 @@ impl SciterSession {
             password: password.clone(),
             args,
             server_keyboard_enabled: Arc::new(RwLock::new(true)),
-            server_file_transfer_enabled: Arc::new(RwLock::new(false)),
-            server_clipboard_enabled: Arc::new(RwLock::new(false)),
+            server_file_transfer_enabled: Arc::new(RwLock::new(true)),
+            server_clipboard_enabled: Arc::new(RwLock::new(true)),
             ..Default::default()
         };
 
