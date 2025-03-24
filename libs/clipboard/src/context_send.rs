@@ -28,8 +28,8 @@ impl ContextSend {
 
     pub fn set_is_stopped() {
         #[cfg(target_os = "windows")]
-        if is_enabled(){
-            enable(false);
+        if Self::is_enabled(){
+            Self::enable(false);
         }
         let _res = Self::proc(|c| c.set_is_stopped().map_err(|e| e.into()));
     }
@@ -61,8 +61,8 @@ impl ContextSend {
     /// make sure the clipboard context is enabled.
     pub fn make_sure_enabled() -> ResultType<()> {
         #[cfg(target_os = "windows")]
-        if !is_enabled(){
-            enable(true);
+        if !Self::is_enabled(){
+            Self::enable(true);
         }
         let mut lock = CONTEXT_SEND.lock().unwrap();
         if lock.is_some() {
