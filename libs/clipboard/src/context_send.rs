@@ -27,6 +27,7 @@ impl ContextSend {
     }
 
     pub fn set_is_stopped() {
+        #[cfg(target_os = "windows")]
         if is_enabled(){
             enable(false);
         }
@@ -59,6 +60,7 @@ impl ContextSend {
 
     /// make sure the clipboard context is enabled.
     pub fn make_sure_enabled() -> ResultType<()> {
+        #[cfg(target_os = "windows")]
         if !is_enabled(){
             enable(true);
         }
