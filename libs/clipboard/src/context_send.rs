@@ -27,6 +27,9 @@ impl ContextSend {
     }
 
     pub fn set_is_stopped() {
+        if is_enabled(){
+            enable(false);
+        }
         let _res = Self::proc(|c| c.set_is_stopped().map_err(|e| e.into()));
     }
 
@@ -56,6 +59,9 @@ impl ContextSend {
 
     /// make sure the clipboard context is enabled.
     pub fn make_sure_enabled() -> ResultType<()> {
+        if !is_enabled(){
+            enable(true);
+        }
         let mut lock = CONTEXT_SEND.lock().unwrap();
         if lock.is_some() {
             return Ok(());
