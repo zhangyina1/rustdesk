@@ -575,10 +575,7 @@ impl CliprdrClientContext {
             }
         }
     }
-}
-
-impl Drop for CliprdrClientContext {
-    fn drop(&mut self) {
+    pub fn drop(&mut self) {
         unsafe {
             if FALSE == uninit_cliprdr(&mut *self) {
                 println!("Failed to uninit cliprdr");

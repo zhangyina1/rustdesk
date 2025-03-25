@@ -11,6 +11,10 @@ pub fn create_cliprdr_context(
             as Box<_>;
     Ok(boxed)
 }
+#[cfg(target_os = "windows")]
+pub fn drop_cliprdr_context() {
+    windows::drop_cliprdr_context();
+}
 
 #[cfg(feature = "unix-file-copy-paste")]
 pub mod unix;
