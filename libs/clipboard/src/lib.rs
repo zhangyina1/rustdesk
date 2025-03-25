@@ -41,6 +41,7 @@ const ERR_CODE_SEND_MSG: u32 = 0x00000003;
     all(target_os = "macos", feature = "unix-file-copy-paste")
 ))]
 pub(crate) use platform::create_cliprdr_context;
+pub(crate) use platform::drop_cliprdr_context;
 
 pub struct ProgressPercent {
     pub percent: f64,
