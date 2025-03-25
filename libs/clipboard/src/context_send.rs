@@ -53,6 +53,7 @@ impl ContextSend {
                 }
             }
         } else if let Some(_clp) = lock.take() {
+            log::info!("111");
             match crate::drop_cliprdr_context(true, false, CLIPBOARD_RESPONSE_WAIT_TIMEOUT_SECS) {
                 Ok(context) => {
                     log::info!("clipboard context for file transfer destroyed.");
