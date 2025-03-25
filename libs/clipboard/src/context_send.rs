@@ -53,9 +53,21 @@ impl ContextSend {
                 }
             }
         } else if let Some(_clp) = lock.take() {
-            *lock = None;
-            crate::drop_cliprdr_context();
-            log::info!("clipboard context for file transfer destroyed.");
+            if !lock.is_some() {
+                return;
+            }
+            match crate::drop_cliprdr_context(true, false, CLIPBOARD_RESPONSE_WAIT_TIMEOUT_SECS) {
+                Ok(context) => {
+                    log::info!("clipboard context for file transfer destroyed.");
+                    *lock = None;
+                }
+                Err(err) => {
+                    log::error!(
+                        "destroy clipboard context for file transfer: {}",
+                        err.to_string()
+                    );
+                }
+            }
         }
     }
 

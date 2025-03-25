@@ -575,12 +575,55 @@ impl CliprdrClientContext {
             }
         }
     }
-    pub fn drop(&mut self) {
+    pub fn drop(
+        enable_files: bool,
+        enable_others: bool,
+        response_wait_timeout_secs: u32,
+        notify_callback: pcNotifyClipboardMsg,
+        client_format_list: pcCliprdrClientFormatList,
+        client_format_list_response: pcCliprdrClientFormatListResponse,
+        client_format_data_request: pcCliprdrClientFormatDataRequest,
+        client_format_data_response: pcCliprdrClientFormatDataResponse,
+        client_file_contents_request: pcCliprdrClientFileContentsRequest,
+        client_file_contents_response: pcCliprdrClientFileContentsResponse,
+    ) -> Result<Box<Self>, CliprdrError> {
+        let context = CliprdrClientContext {
+            Custom: 0 as *mut _,
+            EnableFiles: if enable_files { TRUE } else { FALSE },
+            EnableOthers: if enable_others { TRUE } else { FALSE },
+            IsStopped: FALSE,
+            ResponseWaitTimeoutSecs: response_wait_timeout_secs,
+            ServerCapabilities: None,
+            ClientCapabilities: None,
+            MonitorReady: None,
+            TempDirectory: None,
+            NotifyClipboardMsg: notify_callback,
+            ClientFormatList: client_format_list,
+            ServerFormatList: None,
+            ClientFormatListResponse: client_format_list_response,
+            ServerFormatListResponse: None,
+            ClientLockClipboardData: None,
+            ServerLockClipboardData: None,
+            ClientUnlockClipboardData: None,
+            ServerUnlockClipboardData: None,
+            ClientFormatDataRequest: client_format_data_request,
+            ServerFormatDataRequest: None,
+            ClientFormatDataResponse: client_format_data_response,
+            ServerFormatDataResponse: None,
+            ClientFileContentsRequest: client_file_contents_request,
+            ServerFileContentsRequest: None,
+            ClientFileContentsResponse: client_file_contents_response,
+            ServerFileContentsResponse: None,
+            LastRequestedFormatId: 0,
+        };
+        let mut context = Box::new(context);
         unsafe {
-            if FALSE == uninit_cliprdr(&mut *self) {
+            if FALSE == uninit_cliprdr(&mut (*context)) {
                 println!("Failed to uninit cliprdr");
+                Err(CliprdrError::CliprdrInit)
             } else {
                 println!("Succeeded to uninit cliprdr");
+                Ok(context)
             }
         }
     }
@@ -973,8 +1016,23 @@ pub fn create_cliprdr_context(
     )?)
 }
 
-pub fn drop_cliprdr_context() {
-    CliprdrClientContext::drop();
+pub fn drop_cliprdr_context(
+    enable_files: bool,
+    enable_others: bool,
+    response_wait_timeout_secs: u32,
+) -> ResultType<Box<CliprdrClientContext>> {
+    Ok(CliprdrClientContext::drop(
+        enable_files,
+        enable_others,
+        response_wait_timeout_secs,
+        Some(notify_callback),
+        Some(client_format_list),
+        Some(client_format_list_response),
+        Some(client_format_data_request),
+        Some(client_format_data_response),
+        Some(client_file_contents_request),
+        Some(client_file_contents_response),
+    )?)
 }
 
 extern "C" fn notify_callback(conn_id: UINT32, msg: *const NOTIFICATION_MESSAGE) -> UINT {
