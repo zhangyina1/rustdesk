@@ -1037,7 +1037,7 @@ pub fn drop_cliprdr_context(
         Some(client_format_data_response),
         Some(client_file_contents_request),
         Some(client_file_contents_response),
-    )?)
+    )?);
     log::info!("111");
 }
 
