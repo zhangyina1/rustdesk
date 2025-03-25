@@ -976,6 +976,10 @@ pub fn create_cliprdr_context(
     )?)
 }
 
+pub fn drop_cliprdr_context() {
+    Self::drop();
+}
+
 extern "C" fn notify_callback(conn_id: UINT32, msg: *const NOTIFICATION_MESSAGE) -> UINT {
     log::debug!("notify_callback called");
     let data = unsafe {
