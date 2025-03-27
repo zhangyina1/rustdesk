@@ -588,7 +588,6 @@ impl CliprdrClientContext {
         client_file_contents_request: pcCliprdrClientFileContentsRequest,
         client_file_contents_response: pcCliprdrClientFileContentsResponse,
     ) -> Result<Box<Self>, CliprdrError> {
-        log::info!("111");
         let context = CliprdrClientContext {
             Custom: 0 as *mut _,
             EnableFiles: if enable_files { TRUE } else { FALSE },
@@ -618,9 +617,7 @@ impl CliprdrClientContext {
             ServerFileContentsResponse: None,
             LastRequestedFormatId: 0,
         };
-        log::info!("111");
         let mut context = Box::new(context);
-        log::info!("111");
         unsafe {
             if FALSE == uninit_cliprdr(&mut (*context)) {
                 log::info!("Failed to uninit cliprdr");
@@ -1025,7 +1022,6 @@ pub fn drop_cliprdr_context(
     enable_others: bool,
     response_wait_timeout_secs: u32,
 ) -> ResultType<Box<CliprdrClientContext>> {
-    log::info!("111");
     Ok(CliprdrClientContext::drop(
         enable_files,
         enable_others,
