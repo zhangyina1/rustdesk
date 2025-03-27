@@ -28,14 +28,14 @@ class PeerTabModel with ChangeNotifier {
     'Favorites',
     'Discovered',
     'Address book',
-    'Accessible devices',
+    'Group',
   ];
   static const List<IconData> icons = [
     Icons.access_time_filled,
     Icons.star,
     Icons.explore,
     IconFont.addressBook,
-    IconFont.deviceGroupFill,
+    Icons.group,
   ];
   List<bool> isEnabled = List.from([
     true,

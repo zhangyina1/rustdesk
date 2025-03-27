@@ -6,11 +6,10 @@
 #![allow(deref_nullptr)]
 
 use crate::{
-    send_data, send_data_exclude, ClipboardFile, CliprdrError, CliprdrServiceContext,
-    ProgressPercent, ResultType, ERR_CODE_INVALID_PARAMETER, ERR_CODE_SEND_MSG,
-    ERR_CODE_SERVER_FUNCTION_NONE, VEC_MSG_CHANNEL,
+    allow_err, send_data, ClipboardFile, CliprdrError, CliprdrServiceContext, ResultType,
+    ERR_CODE_INVALID_PARAMETER, ERR_CODE_SEND_MSG, ERR_CODE_SERVER_FUNCTION_NONE, VEC_MSG_CHANNEL,
 };
-use hbb_common::{allow_err, log};
+use hbb_common::log;
 use std::{
     boxed::Box,
     ffi::{CStr, CString},
@@ -568,63 +567,22 @@ impl CliprdrClientContext {
         let mut context = Box::new(context);
         unsafe {
             if FALSE == init_cliprdr(&mut (*context)) {
-                log::info!("Failed to init cliprdr");
+                println!("Failed to init cliprdr");
                 Err(CliprdrError::CliprdrInit)
             } else {
-                log::info!("Succeeded to init cliprdr");
                 Ok(context)
             }
         }
     }
-    pub fn drop(
-        enable_files: bool,
-        enable_others: bool,
-        response_wait_timeout_secs: u32,
-        notify_callback: pcNotifyClipboardMsg,
-        client_format_list: pcCliprdrClientFormatList,
-        client_format_list_response: pcCliprdrClientFormatListResponse,
-        client_format_data_request: pcCliprdrClientFormatDataRequest,
-        client_format_data_response: pcCliprdrClientFormatDataResponse,
-        client_file_contents_request: pcCliprdrClientFileContentsRequest,
-        client_file_contents_response: pcCliprdrClientFileContentsResponse,
-    ) -> Result<Box<Self>, CliprdrError> {
-        let context = CliprdrClientContext {
-            Custom: 0 as *mut _,
-            EnableFiles: if enable_files { TRUE } else { FALSE },
-            EnableOthers: if enable_others { TRUE } else { FALSE },
-            IsStopped: FALSE,
-            ResponseWaitTimeoutSecs: response_wait_timeout_secs,
-            ServerCapabilities: None,
-            ClientCapabilities: None,
-            MonitorReady: None,
-            TempDirectory: None,
-            NotifyClipboardMsg: notify_callback,
-            ClientFormatList: client_format_list,
-            ServerFormatList: None,
-            ClientFormatListResponse: client_format_list_response,
-            ServerFormatListResponse: None,
-            ClientLockClipboardData: None,
-            ServerLockClipboardData: None,
-            ClientUnlockClipboardData: None,
-            ServerUnlockClipboardData: None,
-            ClientFormatDataRequest: client_format_data_request,
-            ServerFormatDataRequest: None,
-            ClientFormatDataResponse: client_format_data_response,
-            ServerFormatDataResponse: None,
-            ClientFileContentsRequest: client_file_contents_request,
-            ServerFileContentsRequest: None,
-            ClientFileContentsResponse: client_file_contents_response,
-            ServerFileContentsResponse: None,
-            LastRequestedFormatId: 0,
-        };
-        let mut context = Box::new(context);
+}
+
+impl Drop for CliprdrClientContext {
+    fn drop(&mut self) {
         unsafe {
-            if FALSE == uninit_cliprdr(&mut (*context)) {
-                log::info!("Failed to uninit cliprdr");
-                Err(CliprdrError::CliprdrInit)
+            if FALSE == uninit_cliprdr(&mut *self) {
+                println!("Failed to uninit cliprdr");
             } else {
-                log::info!("Succeeded to uninit cliprdr");
-                Ok(context)
+                println!("Succeeded to uninit cliprdr");
             }
         }
     }
@@ -644,12 +602,6 @@ impl CliprdrServiceContext for CliprdrClientContext {
         let ret = server_clip_file(self, conn_id, msg);
         ret_to_result(ret)
     }
-
-    fn get_progress_percent(&self) -> Option<ProgressPercent> {
-        None
-    }
-
-    fn cancel(&mut self) {}
 }
 
 fn ret_to_result(ret: u32) -> Result<(), CliprdrError> {
@@ -662,7 +614,6 @@ fn ret_to_result(ret: u32) -> Result<(), CliprdrError> {
         e => Err(CliprdrError::Unknown(e)),
     }
 }
-
 pub fn empty_clipboard(context: &mut CliprdrClientContext, conn_id: i32) -> bool {
     unsafe { TRUE == empty_cliprdr(context, conn_id as u32) }
 }
@@ -692,7 +643,6 @@ pub fn server_clip_file(
                 conn_id,
                 &format_list
             );
-            send_data_exclude(conn_id as _, ClipboardFile::TryEmpty);
             ret = server_format_list(context, conn_id, format_list);
             log::debug!(
                 "server_format_list called, conn_id {}, return {}",
@@ -787,15 +737,6 @@ pub fn server_clip_file(
                 conn_id,
                 msg_flags,
                 stream_id,
-                ret
-            );
-        }
-        ClipboardFile::TryEmpty => {
-            log::debug!("empty_clipboard called");
-            let ret = empty_clipboard(context, conn_id);
-            log::debug!(
-                "empty_clipboard called, conn_id {}, return {}",
-                conn_id,
                 ret
             );
         }
@@ -1004,25 +945,6 @@ pub fn create_cliprdr_context(
     response_wait_timeout_secs: u32,
 ) -> ResultType<Box<CliprdrClientContext>> {
     Ok(CliprdrClientContext::create(
-        enable_files,
-        enable_others,
-        response_wait_timeout_secs,
-        Some(notify_callback),
-        Some(client_format_list),
-        Some(client_format_list_response),
-        Some(client_format_data_request),
-        Some(client_format_data_response),
-        Some(client_file_contents_request),
-        Some(client_file_contents_response),
-    )?)
-}
-
-pub fn drop_cliprdr_context(
-    enable_files: bool,
-    enable_others: bool,
-    response_wait_timeout_secs: u32,
-) -> ResultType<Box<CliprdrClientContext>> {
-    Ok(CliprdrClientContext::drop(
         enable_files,
         enable_others,
         response_wait_timeout_secs,

@@ -28,9 +28,9 @@ env:
   # for arm64 linux because official Dart SDK does not work
   TAG_NAME: "${{ inputs.upload-tag }}"
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-  # vcpkg version: 2025.01.13
-  VCPKG_COMMIT_ID: "6f29f12e82a8293156836ad81cc9bf5af41fe836"
-  VERSION: "1.3.9"
+  # vcpkg version: 2024.11.16
+  VCPKG_COMMIT_ID: "b2cb0da531c2f1f740045bfe7c4dac59f0b2b69c"
+  VERSION: "1.3.6"
   NDK_VERSION: "r27c"
   #signing keys env variable checks
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
@@ -78,8 +78,6 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Restore bridge files
         uses: actions/download-artifact@master

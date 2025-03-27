@@ -25,7 +25,9 @@ use hbb_common::{
     config::{self, Config, Config2},
     futures::StreamExt as _,
     futures_util::sink::SinkExt,
-    log, password_security as password, timeout,
+    log, password_security as password,
+    sodiumoxide::base64,
+    timeout,
     tokio::{
         self,
         io::{AsyncRead, AsyncWrite},
@@ -188,7 +190,6 @@ pub enum Data {
     Login {
         id: i32,
         is_file_transfer: bool,
-        is_view_camera: bool,
         peer_id: String,
         name: String,
         authorized: bool,
@@ -229,7 +230,7 @@ pub enum Data {
     FS(FS),
     Test,
     SyncConfig(Option<Box<(Config, Config2)>>),
-    #[cfg(target_os = "windows")]
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     ClipboardFile(ClipboardFile),
     ClipboardFileEnabled(bool),
     #[cfg(target_os = "windows")]
@@ -1281,6 +1282,6 @@ mod test {
     #[test]
     fn verify_ffi_enum_data_size() {
         println!("{}", std::mem::size_of::<Data>());
-        assert!(std::mem::size_of::<Data>() <= 96);
+        assert!(std::mem::size_of::<Data>() < 96);
     }
 }

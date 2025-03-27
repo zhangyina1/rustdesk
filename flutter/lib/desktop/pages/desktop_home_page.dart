@@ -134,17 +134,12 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         color: Theme.of(context).colorScheme.background,
         child: Stack(
           children: [
-            Column(
-              children: [
-                SingleChildScrollView(
-                  controller: _leftPaneScrollController,
-                  child: Column(
-                    key: _childKey,
-                    children: children,
-                  ),
-                ),
-                Expanded(child: Container())
-              ],
+            SingleChildScrollView(
+              controller: _leftPaneScrollController,
+              child: Column(
+                key: _childKey,
+                children: children,
+              ),
             ),
             if (isOutgoingOnly)
               Positioned(
@@ -775,7 +770,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         await connectMainDesktop(
           call.arguments['id'],
           isFileTransfer: call.arguments['isFileTransfer'],
-          isViewCamera: call.arguments['isViewCamera'],
           isTcpTunneling: call.arguments['isTcpTunneling'],
           isRDP: call.arguments['isRDP'],
           password: call.arguments['password'],
@@ -790,15 +784,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         } catch (e) {
           debugPrint("Failed to parse window id '${call.arguments}': $e");
         }
-        WindowType? windowType;
-        try {
-          windowType = WindowType.values.byName(args[3]);
-        } catch (e) {
-          debugPrint("Failed to parse window type '${call.arguments}': $e");
-        }
-        if (windowId != null && windowType != null) {
+        if (windowId != null) {
           await rustDeskWinManager.moveTabToNewWindow(
-              windowId, args[1], args[2], windowType);
+              windowId, args[1], args[2]);
         }
       } else if (call.method == kWindowEventOpenMonitorSession) {
         final args = jsonDecode(call.arguments);
@@ -806,10 +794,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         final peerId = args['peer_id'] as String;
         final display = args['display'] as int;
         final displayCount = args['display_count'] as int;
-        final windowType = args['window_type'] as int;
         final screenRect = parseParamScreenRect(args);
         await rustDeskWinManager.openMonitorSession(
-            windowId, peerId, display, displayCount, screenRect, windowType);
+            windowId, peerId, display, displayCount, screenRect);
       } else if (call.method == kWindowEventRemoteWindowCoords) {
         final windowId = int.tryParse(call.arguments);
         if (windowId != null) {
@@ -847,6 +834,10 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     _uniLinksSubscription?.cancel();
     Get.delete<RxBool>(tag: 'stop-service');
     _updateTimer?.cancel();
+    if (!bind.isCustomClient()) {
+      platformFFI.unregisterEventHandler(
+          kCheckSoftwareUpdateFinish, kCheckSoftwareUpdateFinish);
+    }
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

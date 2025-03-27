@@ -19,7 +19,6 @@ impl InvokeUiCM for SciterHandler {
             &make_args!(
                 client.id,
                 client.is_file_transfer,
-                client.is_view_camera,
                 client.port_forward.clone(),
                 client.peer_id.clone(),
                 client.name.clone(),
