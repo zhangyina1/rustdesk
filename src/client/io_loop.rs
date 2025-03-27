@@ -137,6 +137,19 @@ impl<T: InvokeUiSession> Remote<T> {
             {
                 // It is ok to call this function multiple times.
                 ContextSend::enable(true);
+                Some(crate::SimpleCallOnReturn {
+                    b: true,
+                    f: Box::new(|| {
+                        // No need to call `enable(false)` for sciter version, because each client of sciter version is a new process.
+                        // It's better to check if the peers are windows(support file copy&paste), but it's not necessary.
+                        #[cfg(feature = "flutter")]
+                        if !crate::flutter::sessions::has_sessions_running(ConnType::DEFAULT_CONN) {
+                            ContextSend::enable(false);
+                        };
+                    }),
+                })
+            } else {
+                None
             }
         };
 
@@ -334,12 +347,6 @@ impl<T: InvokeUiSession> Remote<T> {
             crate::clipboard::try_empty_clipboard_files(ClipboardSide::Client, self.client_conn_id);
         }
 
-        // No need to call `enable(false)` for sciter version, because each client of sciter version is a new process.
-        // It's better to check if the peers are windows(support file copy&paste), but it's not necessary.
-        #[cfg(feature = "flutter")]
-        if !crate::flutter::sessions::has_sessions_running(ConnType::DEFAULT_CONN) {
-            ContextSend::enable(false);
-        };
     }
 
     #[cfg(any(target_os = "windows", feature = "unix-file-copy-paste"))]
@@ -370,7 +377,7 @@ impl<T: InvokeUiSession> Remote<T> {
                             || !(server_file_transfer_enabled && file_transfer_enabled));
                     log::debug!(
                         "Process clipboard message from system, stop: {}, is_stopping_allowed: {}, view_only: {}, server_file_transfer_enabled: {}, file_transfer_enabled: {}",
-                        view_only, stop, is_stopping_allowed, server_file_transfer_enabled, file_transfer_enabled
+                        stop, is_stopping_allowed, view_only, server_file_transfer_enabled, file_transfer_enabled
                     );
                     if stop {
                         #[cfg(target_os = "windows")]
