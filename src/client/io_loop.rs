@@ -136,8 +136,6 @@ impl<T: InvokeUiSession> Remote<T> {
             {
                 // It is ok to call this function multiple times.
                 ContextSend::enable(true);
-            } else {
-                None
             }
         };
 
