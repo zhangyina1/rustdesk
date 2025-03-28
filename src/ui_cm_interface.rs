@@ -198,6 +198,7 @@ impl<T: InvokeUiCM> ConnectionManager<T> {
 
         #[cfg(target_os = "windows")]
         {
+            log::info!("123");
             crate::clipboard::try_empty_clipboard_files(ClipboardSide::Host, id);
         }
 
