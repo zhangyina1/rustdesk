@@ -321,12 +321,6 @@ impl<T: InvokeUiSession> Remote<T> {
         if !self.handler.is_view_camera() && _set_disconnected_ok {
             crate::clipboard::try_empty_clipboard_files(ClipboardSide::Client, self.client_conn_id);
         }
-
-         // It's better to check if the peers are windows, but it's not necessary.
-         #[cfg(feature = "flutter")]
-         if !crate::flutter::sessions::has_sessions_running(ConnType::DEFAULT_CONN) {
-             ContextSend::enable(false);
-         }
     }
 
     #[cfg(any(target_os = "windows", feature = "unix-file-copy-paste"))]
