@@ -320,7 +320,6 @@ impl<T: InvokeUiSession> Remote<T> {
         #[cfg(any(target_os = "windows", feature = "unix-file-copy-paste"))]
         if !self.handler.is_view_camera() && _set_disconnected_ok {
             //关闭的时候清空一下子？可能不会bug但是不太对劲吧
-            log::info!("123");
             crate::clipboard::try_empty_clipboard_files(ClipboardSide::Client, self.client_conn_id);
         }
     }
@@ -1603,7 +1602,6 @@ impl<T: InvokeUiSession> Remote<T> {
                                 #[cfg(feature = "unix-file-copy-paste")]
                                 if !p.enabled {
                                     //不启用剪贴板就清空？？不动它不行嘛？
-                                    log::info!("123");      
                                     try_empty_clipboard_files(
                                         ClipboardSide::Client,
                                         self.client_conn_id,

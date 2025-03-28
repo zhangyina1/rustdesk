@@ -3697,7 +3697,6 @@ impl Connection {
     #[cfg(feature = "unix-file-copy-paste")]
     fn try_empty_file_clipboard(&mut self) {
         if self.clipboard_enabled(){
-            log::info!("123");
             try_empty_clipboard_files(ClipboardSide::Host, self.inner.id());
         }
     }
