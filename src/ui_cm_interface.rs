@@ -198,7 +198,11 @@ impl<T: InvokeUiCM> ConnectionManager<T> {
 
         #[cfg(target_os = "windows")]
         {
-            crate::clipboard::try_empty_clipboard_files(ClipboardSide::Host, id);
+            let is_clipboard_enabled = ContextSend::is_enabled();
+            let file_transfer_enabled = self.file_transfer_enabled;
+            if is_clipboard_enabled && file_transfer_enabled {
+                crate::clipboard::try_empty_clipboard_files(ClipboardSide::Host, id);
+            }
         }
 
         #[cfg(any(target_os = "android"))]

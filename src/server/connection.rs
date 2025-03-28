@@ -3696,7 +3696,9 @@ impl Connection {
     #[inline]
     #[cfg(feature = "unix-file-copy-paste")]
     fn try_empty_file_clipboard(&mut self) {
-        try_empty_clipboard_files(ClipboardSide::Host, self.inner.id());
+        if self.clipboard_enabled(){
+            try_empty_clipboard_files(ClipboardSide::Host, self.inner.id());
+        }
     }
 
     #[cfg(all(target_os = "windows", feature = "flutter"))]

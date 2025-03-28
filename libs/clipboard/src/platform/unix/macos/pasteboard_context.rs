@@ -372,6 +372,7 @@ impl PasteboardContext {
 
     fn handle_try_empty(&mut self, conn_id: i32) {
         log::debug!("empty_clipboard called");
+        //不知道会不会出事
         let ret = self.empty_clipboard_(conn_id);
         log::debug!(
             "empty_clipboard called, conn_id {}, return {}",
