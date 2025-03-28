@@ -651,7 +651,7 @@ pub fn server_clip_file(
                 conn_id,
                 &format_list
             );
-            send_data_exclude(conn_id as _, ClipboardFile::TryEmpty);
+            // send_data_exclude(conn_id as _, ClipboardFile::TryEmpty);
             ret = server_format_list(context, conn_id, format_list);
             log::debug!(
                 "server_format_list called, conn_id {}, return {}",
