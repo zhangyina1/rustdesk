@@ -509,13 +509,13 @@ class _AddressBookState extends State<AddressBook> {
 
       double marginBottom = 4;
 
-      row({required Widget label, required Widget input}) {
+      row({required Widget lable, required Widget input}) {
         makeChild(bool isPortrait) => Row(
               children: [
                 !isPortrait
                     ? ConstrainedBox(
                         constraints: const BoxConstraints(minWidth: 100),
-                        child: label.marginOnly(right: 10))
+                        child: lable.marginOnly(right: 10))
                     : SizedBox.shrink(),
                 Expanded(
                   child: ConstrainedBox(
@@ -535,7 +535,7 @@ class _AddressBookState extends State<AddressBook> {
             Column(
               children: [
                 row(
-                    label: Row(
+                    lable: Row(
                       children: [
                         Text(
                           '*',
@@ -558,7 +558,7 @@ class _AddressBookState extends State<AddressBook> {
                               errorMaxLines: 5),
                         ).workaroundFreezeLinuxMint())),
                 row(
-                  label: Text(
+                  lable: Text(
                     translate('Alias'),
                     style: style,
                   ),
@@ -573,7 +573,7 @@ class _AddressBookState extends State<AddressBook> {
                 ),
                 if (isCurrentAbShared)
                   row(
-                      label: Text(
+                      lable: Text(
                         translate('Password'),
                         style: style,
                       ),

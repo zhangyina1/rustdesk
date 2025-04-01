@@ -133,7 +133,7 @@ impl MagInterface {
             s.lib_handle = LoadLibraryExA(
                 lib_file_name_c.as_ptr() as _,
                 NULL,
-                LOAD_LIBRARY_SEARCH_SYSTEM32,
+                LOAD_WITH_ALTERED_SEARCH_PATH,
             );
             if s.lib_handle.is_null() {
                 return Err(Error::new(
