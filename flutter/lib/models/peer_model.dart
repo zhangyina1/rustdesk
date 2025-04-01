@@ -19,7 +19,6 @@ class Peer {
   String rdpUsername;
   bool online = false;
   String loginName; //login username
-  String device_group_name;
   bool? sameServer;
 
   String getId() {
@@ -42,7 +41,6 @@ class Peer {
         rdpPort = json['rdpPort'] ?? '',
         rdpUsername = json['rdpUsername'] ?? '',
         loginName = json['loginName'] ?? '',
-        device_group_name = json['device_group_name'] ?? '',
         sameServer = json['same_server'];
 
   Map<String, dynamic> toJson() {
@@ -59,7 +57,6 @@ class Peer {
       "rdpPort": rdpPort,
       "rdpUsername": rdpUsername,
       'loginName': loginName,
-      'device_group_name': device_group_name,
       'same_server': sameServer,
     };
   }
@@ -86,7 +83,6 @@ class Peer {
       "hostname": hostname,
       "platform": platform,
       "login_name": loginName,
-      "device_group_name": device_group_name,
     };
   }
 
@@ -103,7 +99,6 @@ class Peer {
     required this.rdpPort,
     required this.rdpUsername,
     required this.loginName,
-    required this.device_group_name,
     this.sameServer,
   });
 
@@ -121,7 +116,6 @@ class Peer {
           rdpPort: '',
           rdpUsername: '',
           loginName: '',
-          device_group_name: '',
         );
   bool equal(Peer other) {
     return id == other.id &&
@@ -135,7 +129,6 @@ class Peer {
         forceAlwaysRelay == other.forceAlwaysRelay &&
         rdpPort == other.rdpPort &&
         rdpUsername == other.rdpUsername &&
-        device_group_name == other.device_group_name &&
         loginName == other.loginName;
   }
 
@@ -153,7 +146,6 @@ class Peer {
             rdpPort: other.rdpPort,
             rdpUsername: other.rdpUsername,
             loginName: other.loginName,
-            device_group_name: other.device_group_name,
             sameServer: other.sameServer);
 }
 
@@ -165,11 +157,6 @@ class Peers extends ChangeNotifier {
   final String name;
   final String loadEvent;
   List<Peer> peers = List.empty(growable: true);
-  // Part of the peers that are not in the rest peers list.
-  // When there're too many peers, we may want to load the front 100 peers first,
-  // so we can see peers in UI quickly. `restPeerIds` is the rest peers' ids.
-  // And then load all peers later.
-  List<String> restPeerIds = List.empty(growable: true);
   final GetInitPeers? getInitPeers;
   UpdateEvent event = UpdateEvent.load;
   static const _cbQueryOnlines = 'callback_query_onlines';
@@ -243,12 +230,6 @@ class Peers extends ChangeNotifier {
     } else {
       peers = _decodePeers(evt['peers']);
     }
-
-    restPeerIds = [];
-    if (evt['ids'] != null) {
-      restPeerIds = (evt['ids'] as String).split(',');
-    }
-
     for (var peer in peers) {
       final state = onlineStates[peer.id];
       peer.online = state != null && state != false;

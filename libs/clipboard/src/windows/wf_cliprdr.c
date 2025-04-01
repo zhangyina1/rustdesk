@@ -269,7 +269,6 @@ static UINT cliprdr_send_request_filecontents(wfClipboard *clipboard, UINT32 con
 											  DWORD positionlow, ULONG request);
 
 static BOOL is_file_descriptor_from_remote();
-static BOOL is_set_by_instance(wfClipboard *clipboard);
 
 static void CliprdrDataObject_Delete(CliprdrDataObject *instance);
 
@@ -601,11 +600,8 @@ static CliprdrStream *CliprdrStream_New(UINT32 connID, ULONG index, void *pData,
 					clipboard->req_fdata = NULL;
 				}
 			}
-			else {
-				instance->m_lSize.QuadPart =
-				    ((UINT64)instance->m_Dsc.nFileSizeHigh << 32) | instance->m_Dsc.nFileSizeLow;
+			else
 				success = TRUE;
-			}
 		}
 	}
 
@@ -1749,7 +1745,8 @@ static LRESULT CALLBACK cliprdr_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM 
 		DEBUG_CLIPRDR("info: WM_CLIPBOARDUPDATE");
 		// if (clipboard->sync)
 		{
-			if (!is_set_by_instance(clipboard))
+			if ((GetClipboardOwner() != clipboard->hwnd) &&
+				(S_FALSE == OleIsCurrentClipboard(clipboard->data_obj)))
 			{
 				if (clipboard->hmem)
 				{
@@ -2089,8 +2086,6 @@ static FILEDESCRIPTORW *wf_cliprdr_get_file_descriptor(WCHAR *file_name, size_t 
 		return NULL;
 	}
 
-	// to-do: use `fd->dwFlags = FD_ATTRIBUTES | FD_FILESIZE | FD_WRITESTIME | FD_PROGRESSUI`.
-	// We keep `fd->dwFlags = FD_ATTRIBUTES | FD_WRITESTIME | FD_PROGRESSUI` for compatibility.
 	// fd->dwFlags = FD_ATTRIBUTES | FD_FILESIZE | FD_WRITESTIME | FD_PROGRESSUI;
 	fd->dwFlags = FD_ATTRIBUTES | FD_WRITESTIME | FD_PROGRESSUI;
 	fd->dwFileAttributes = GetFileAttributesW(file_name);
@@ -2854,31 +2849,6 @@ wf_cliprdr_server_file_contents_request(CliprdrClientContext *context,
 		goto exit;
 	}
 
-	// If the clipboard is set by the instance, or the file descriptor is from remote,
-	// we should not process the request.
-	// Because this may be the following cases:
-	// 1. `A` -> `B`, `C`
-	// 2. Copy in `A`
-	// 3. Copy in `B`
-	// 4. Paste in `C`
-	// In this case, `C` should not get the file content from `A`. The clipboard is set by `B`.
-	//
-	// Or
-	// 1. `B` -> `A` -> `C`
-	// 2. Copy in `A`
-	// 2. Copy in `B`
-	// 3. Paste in `C`
-	// In this case, `C` should not get the file content from `A`. The clipboard is set by `B`.
-	//
-	// We can simply notify `C` to clear the clipboard when `A` received copy message from `B`,
-	// if connections are in the same process.
-	// But if connections are in different processes, it is not easy to notify the other process.
-	// So we just ignore the request from `C` in this case.
-	if (is_set_by_instance(clipboard) || is_file_descriptor_from_remote()) {
-		rc = ERROR_INTERNAL_ERROR;
-		goto exit;
-	}
-
 	cbRequested = fileContentsRequest->cbRequested;
 	if (fileContentsRequest->dwFlags == FILECONTENTS_SIZE)
 		cbRequested = sizeof(UINT64);
@@ -3119,14 +3089,6 @@ wf_cliprdr_server_file_contents_response(CliprdrClientContext *context,
 	return rc;
 }
 
-BOOL is_set_by_instance(wfClipboard *clipboard)
-{
-	if (GetClipboardOwner() == clipboard->hwnd || S_OK == OleIsCurrentClipboard(clipboard->data_obj)) {
-		return TRUE;
-	}
-	return FALSE;
-}
-
 BOOL is_file_descriptor_from_remote()
 {
 	UINT fsid = 0;
@@ -3213,7 +3175,7 @@ BOOL wf_cliprdr_uninit(wfClipboard *clipboard, CliprdrClientContext *cliprdr)
 	/* discard all contexts in clipboard */
 	if (try_open_clipboard(clipboard->hwnd))
 	{
-		if (is_set_by_instance(clipboard) || is_file_descriptor_from_remote())
+		if (is_file_descriptor_from_remote())
 		{
 			if (!EmptyClipboard())
 			{

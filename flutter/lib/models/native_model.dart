@@ -60,14 +60,14 @@ class PlatformFFI {
   }
 
   bool registerEventHandler(
-      String eventName, String handlerName, HandleEvent handler, {bool replace = false}) {
+      String eventName, String handlerName, HandleEvent handler) {
     debugPrint('registerEventHandler $eventName $handlerName');
     var handlers = _eventHandlers[eventName];
     if (handlers == null) {
       _eventHandlers[eventName] = {handlerName: handler};
       return true;
     } else {
-      if (!replace && handlers.containsKey(handlerName)) {
+      if (handlers.containsKey(handlerName)) {
         return false;
       } else {
         handlers[handlerName] = handler;
