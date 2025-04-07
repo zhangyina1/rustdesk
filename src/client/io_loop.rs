@@ -503,7 +503,7 @@ impl<T: InvokeUiSession> Remote<T> {
                     .handle_login_from_ui(os_username, os_password, password, remember, peer)
                     .await;
             }
-            #[cfg(all(target_os = "windows", not(feature = "flutter")))]
+            #[cfg(all(target_os = "windows"))]
             Data::ToggleClipboardFile => {
                 self.check_clipboard_file_context();
             }
@@ -1258,7 +1258,7 @@ impl<T: InvokeUiSession> Remote<T> {
                             }
                         }
                         self.handler.handle_peer_info(pi);
-                        #[cfg(all(target_os = "windows", not(feature = "flutter")))]
+                        #[cfg(all(target_os = "windows"))]
                         self.check_clipboard_file_context();
                         if !(self.handler.is_file_transfer()
                             || self.handler.is_port_forward()
@@ -2069,7 +2069,7 @@ impl<T: InvokeUiSession> Remote<T> {
         true
     }
 
-    #[cfg(all(target_os = "windows", not(feature = "flutter")))]
+    #[cfg(all(target_os = "windows"))]
     fn check_clipboard_file_context(&self) {
         let enabled = *self.handler.server_file_transfer_enabled.read().unwrap()
             && self.handler.lc.read().unwrap().enable_file_copy_paste.v;
